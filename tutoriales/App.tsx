@@ -1,10 +1,11 @@
-import { Alert, FlatList, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
+import { Alert, FlatList, Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
 import React, { useState } from 'react'
 import { calcularDivisores, toEnteroPositivo } from './utils/Funciones'
 import CajaDivisor from './components/CajaDivisor'
 
 export default function App() {
 
+  const [modalVisible,setModalVisible]= useState(false)
   const [texto,setTexto]=useState("")
   const [listaDivisores,setListaDivisores] = useState<Array<number>>([])
 
@@ -14,6 +15,7 @@ export default function App() {
     if(exito){
       const lista= calcularDivisores(valor)
       setListaDivisores(lista)
+      setModalVisible(true)
     }else{
       Alert.alert("Error","Debe introducirse un numero entero positivo")
     }
@@ -35,14 +37,21 @@ export default function App() {
         >
           <Text style={styles.textoBoton}>Aceptar</Text>
         </Pressable>
-      </View>
-      <View style={styles.contenedorSecundario}>
-        <FlatList
-        data={listaDivisores}
-        renderItem={CajaDivisor}
-        keyExtractor={numero =>numero.toString()}
-        numColumns={4}
-        />
+        {
+          modalVisible && (
+            <Modal animationType={"slide"} transparent={false}>
+              <Pressable onPress={()=> setModalVisible(false)} style={styles.zonaSuperiorModal}/>
+              <View style={styles.zonaInferiorModal}>
+                <FlatList
+                  data={listaDivisores}
+                  renderItem={CajaDivisor}
+                  keyExtractor={numero =>numero.toString()}
+                  numColumns={4}
+                />
+              </View>
+            </Modal>
+          )
+        }
       </View>
     </View>
   )
@@ -94,5 +103,21 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600",
 
+  },
+  zonaInferiorModal: {
+    position: "absolute",
+    bottom: 0,
+    width: "100%",
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    paddingBottom: 32,
+    alignItems: "center",
+  },
+  zonaSuperiorModal:{
+    flex:1,
+    backgroundColor:"rgba(0,0,0,0,1)"
   }
 })
